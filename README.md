@@ -1,4 +1,6 @@
-THis Repo is READ ONLY! More in the License!
+Copyright © 2026 TrafkHop Entertainment™
+All rights reserved.
+# Raufbold3b's Scratch Archive (RSA)
 
 Hey so, thats the Archive for 15 Games, that HoppiTex, founder of Trafkhop, made a looong time ago.
 
