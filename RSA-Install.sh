@@ -8,9 +8,11 @@ set -euo pipefail
 # GAMES_REF=<hash> ICONS_REF=<hash> ./RSA-Install.sh)
 GAMES_REF="${GAMES_REF:-HEAD}"
 ICONS_REF="${ICONS_REF:-HEAD}"
+LICENSE_REF="${LICENSE_REF:-HEAD}"
 
 GAMES_BASE_URL="https://raw.githubusercontent.com/TrafkHop-Entertainment/Raufbold3bs-Scratch-Archive/${GAMES_REF}/Games"
 ICONS_BASE_URL="https://raw.githubusercontent.com/TrafkHop-Entertainment/SourceHop-Images/${ICONS_REF}/Projects/RSA/Thumbnails"
+LICENSE_URL="https://raw.githubusercontent.com/TrafkHop-Entertainment/Raufbold3bs-Scratch-Archive/${LICENSE_REF}/LICENSE"
 
 INSTALL_DIR="${HOME}/.local/share/TrafkHopEntertainment/Raufbold3bs-Scratch-Archive"
 DESKTOP_DIR="${HOME}/.local/share/applications"
@@ -110,6 +112,19 @@ fi
 BUILD_DIR="$(mktemp -d)"
 trap 'rm -rf "$BUILD_DIR"' EXIT
 
+# ---------------------------------------------------------------- LICENSE
+info "Lade LICENSE herunter ..."
+staged_license="${BUILD_DIR}/LICENSE"
+if wget -q --show-progress -O "$staged_license" "$LICENSE_URL" && [ -s "$staged_license" ]; then
+    install -m 644 "$staged_license" "${INSTALL_DIR}/.LICENSE.new"
+    mv -f "${INSTALL_DIR}/.LICENSE.new" "${INSTALL_DIR}/LICENSE"
+    ok "LICENSE installiert."
+else
+    # Plain text hat kein Magic-Byte wie PNG/RIFF; ein einfacher Nicht-leer-
+    # Check reicht hier, um zumindest einen 404-als-leere-Datei-Fall abzufangen.
+    err "LICENSE-Download fehlgeschlagen oder leer. Prüfe die URL: ${LICENSE_URL}"
+fi
+
 echo "Starting download in: $INSTALL_DIR"
 echo ""
 
@@ -204,6 +219,7 @@ command -v gtk-update-icon-cache >/dev/null 2>&1 && \
 echo ""
 ok "Installation abgeschlossen: ${INSTALLED}/${#GAMES[@]} Spiele installiert."
 echo "    Spiele-Ordner : ${INSTALL_DIR}"
+echo "    LICENSE       : ${INSTALL_DIR}/LICENSE"
 echo "    App-Menü      : ${DESKTOP_DIR}"
 [ -n "${USER_DESKTOP_DIR:-}" ] && [ -d "${USER_DESKTOP_DIR:-}" ] && \
     echo "    Desktop       : ${USER_DESKTOP_DIR}"
